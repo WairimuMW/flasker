@@ -1,2 +1,6 @@
-<!-- using filters eg upper, capitalize, lower, ... -->
-<h1>Hello {{ user_name|capitalize}} </h1> 
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- using filters eg upper, capitalize, lower, ... -->
+    <h1>Hello {{ user_name|capitalize}} </h1> 
+{% endblock %}

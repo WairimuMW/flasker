@@ -1,23 +1,29 @@
-<h1>Hello World!</h1>
-<p>This is my first flask webpage</p>
-<p>Isn't this cool?!</p>
-<p>My name is {{ first_name }} </p>
-<p>{{ blah|safe }}</p>
-<p>{{ blah|striptags }}</p>
-<p>{{ blah2|title }}</p>
+{% extends 'base.html' %}
 
-<h3>Pizza</h3>
-<!-- iterating through a list -->
-{% for topping in pizza %}
+{% block content %}
 
-    {% if topping == 42 %}
-        {{ topping + 100 }} <br>
-    {% else %}
-        {{ topping }} <br>
-    {% endif %}
+    <h1>Hello World!</h1>
+    <p>This is my first flask webpage</p>
+    <p>Isn't this cool?!</p>
+    <p>My name is {{ first_name }} </p>
+    <p>{{ blah|safe }}</p>
+    <p>{{ blah|striptags }}</p>
+    <p>{{ blah2|title }}</p>
 
-{% endfor %}
+    <h3>Pizza</h3>
+    <!-- iterating through a list -->
+    {% for topping in pizza %}
 
-<br><br>
-<!-- accessing the first item -->
-{{ pizza.0 }} 
+        {% if topping == 42 %}
+            {{ topping + 100 }} <br>
+        {% else %}
+            {{ topping }} <br>
+        {% endif %}
+
+    {% endfor %}
+
+    <br><br>
+    <!-- accessing the first item -->
+    {{ pizza.0 }} 
+
+{% endblock %}
