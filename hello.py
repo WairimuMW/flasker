@@ -3,11 +3,46 @@ from flask import Flask, render_template, flash
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 
 # Create a Flask instance
 app = Flask(__name__, template_folder='templates')
-app.config['SECRET_KEY'] = "super secret key that should be hidden" # secret key for csrf token
+
+# add database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+
+# secret key for csrf token
+app.config['SECRET_KEY'] = "super secret key that should be hidden"
+
+# initialize the database
+db = SQLAlchemy(app)
+
+# def create_app():
+#     app = Flask(__name__)
+
+#     with app.app_context():
+#         db()
+
+#     return app
+
+# create model -> what you want to store in the db
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name =  db.Column(db.String(200), nullable=False)
+    email =  db.Column(db.String(120), nullable=False, unique=True)
+    date_added =  db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # create a string
+    def __repr__(self):
+        return '<Name %r>' % self.name
+
+# User form
+class UserForm(FlaskForm):
+    name = StringField("Name", validators=[DataRequired()])
+    email = StringField("Email", validators=[DataRequired()])
+    submit = SubmitField("Submit")    
 
 # Create a Form Class
 class NamerForm(FlaskForm):
@@ -65,6 +100,8 @@ class NamerForm(FlaskForm):
 # trim -> removes trailing spaces from the end
 # striptags -> strips any html tags
 
+
+
 def index():
     first_name = "Mary"
     blah = "This is <strong>Bold</strong> Text"
@@ -117,3 +154,27 @@ def name():
     return render_template("name.html",
                            name = name,
                            form = form)
+
+
+# add user page
+@app.route('/user/add', methods=['GET', 'POST'])
+def add_user():
+    name = None
+    form = UserForm()
+    
+    # validate form
+    if form.validate_on_submit():
+        user = Users.query.filter_by(email=form.email.data).first()
+        if user is None:
+            user = Users(name=form.name.data, email=form.email.data)
+            db.session.add(user)
+            db.session.commit()
+        name = form.name.data
+        form.name.data = ''
+        form.email.data = ''
+        flash("User added successfully!")
+    our_users = Users.query.order_by(Users.date_added)
+    return render_template("add_user.html", 
+                           name=name, 
+                           form=form,
+                           our_users=our_users)
